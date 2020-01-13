@@ -23,18 +23,20 @@ export default class Authenticate extends Component {
                 last_name: ''                
             },
         }
+
+        this.getUsers().then((response) => {
+            this.setState({
+              profiles: [...response.data]
+            }, () => {
+              console.log(this.state)
+            });
+          }).catch(err => {
+            console.error(err)
+          });
     }
 
     componentDidMount () {
-        this.getUsers().then((response) => {
-          this.setState({
-            profiles: [...response.data]
-          }, () => {
-            console.log(this.state)
-          });
-        }).catch(err => {
-          console.error(err)
-        });
+
       }
 
     formFunctions = {

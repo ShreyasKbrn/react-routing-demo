@@ -7,6 +7,7 @@ import About from "./components/about/About";
 import Dash from "./components/dash/Dash";
 import Authenticate from './components/auth/Authenticate';
 import { PrivateRoute } from './privateRoute/privateRoute';
+import { PublicRoute } from './publicRoute/publicRoute';
 
 class App extends Component {
 
@@ -25,9 +26,9 @@ class App extends Component {
   
                   <PrivateRoute exact path="/" component={Dash}/>
 
-                  <Route exact path="/signin" render = {props => <Authenticate 
-                    concern = 'signin'
-                  />}/>      
+                  <PublicRoute exact path="/signin" component={Authenticate} restricted={true} componentProps={
+                    {concern: 'signin'}
+                  }/> 
 
                     <Route path='/signup' render = { props => <Authenticate 
                       concern = 'signup'
@@ -55,4 +56,7 @@ export default App;
                     <Route path="/signin" exact render = {props => <Signin callback = {this.loginResponse} profiles={this.state.profiles}/>}/>
   
                   <Route path="/signup" exact render = {props => <Signup profiles={this.state.profiles}/>}/>
+                  <Route exact path="/signin" render = {props => <Authenticate 
+                    concern = 'signin'
+                  />}/>
 */
