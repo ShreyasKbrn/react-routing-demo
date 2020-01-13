@@ -24,17 +24,18 @@ class App extends Component {
               <BrowserRouter>
                 <Switch>
   
-                  <PrivateRoute exact path="/" component={Dash}/>
+                  <PrivateRoute exact path="/" component={Dash} conditionExpression = {localStorage.getItem('token')}/>
 
                   <PublicRoute exact path="/signin" component={Authenticate} restricted={true} componentProps={
                     {concern: 'signin'}
                   }/> 
 
-                    <Route path='/signup' render = { props => <Authenticate 
-                      concern = 'signup'
-                    />}/>
 
-                  <Route component = {props => <Redirect to="/signup"/>}/>
+                  <PublicRoute exact path="/signup" component={Authenticate} restricted={true} componentProps={
+                    {concern: 'signup'}
+                  }/> 
+
+                  <Redirect to="/"/>
                 </Switch>
               </BrowserRouter>
       </div>
