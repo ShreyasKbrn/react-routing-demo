@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect, Route } from 'react-router-dom';
+import { api } from '../../services/api-service';
 
 export default class Authenticate extends Component {
-
-    getUsers = () => {
-        return axios.get('https://my-json-server.typicode.com/ShreyasKbrn/the_bill_split_mocky/profile');
-      }
 
     constructor (props) {
         super(props);
@@ -18,26 +15,11 @@ export default class Authenticate extends Component {
             },
             signup: {
                 email: '',
-                id: '',
                 first_name: '',
                 last_name: ''                
             },
         }
-
-        this.getUsers().then((response) => {
-            this.setState({
-              profiles: [...response.data]
-            }, () => {
-              console.log(this.state)
-            });
-          }).catch(err => {
-            console.error(err)
-          });
     }
-
-    componentDidMount () {
-
-      }
 
     formFunctions = {
         onChange : (e) => {
@@ -55,28 +37,51 @@ export default class Authenticate extends Component {
         },
         signInFunctions : {
             onSubmit: () => {
-                let profiles = [...this.state.profiles];
-                let isSubmitted = false;
-                
-                for (let i=0; i<profiles.length; i++) {
-                    if (profiles[i].email === this.state.signin.email && profiles[i].id ===Number.parseInt(this.state.signin.id)) {
-                        isSubmitted = true;
-                        localStorage.setItem('token', new Date()*1+'');
-                    }
-                }
+                let responsePromise = api.authenticate({email: this.state.signin.email, id: this.state.signin.id});
+                responsePromise.then((response) => {
+                    let {status, token} =response.data;
+                    if (status === -1) {
 
-                let signin = {
-                    ...this.state.signin,
-                    isSubmitted: isSubmitted
-                };
-                this.setState({
-                    ...this.state,
-                    ['signin']: {...signin}                            
-                });                
+                    } else {
+                        localStorage.setItem('token', token);
+                        let signin = {
+                            ...this.state.signin,
+                            isSubmitted: true
+                        };
+                        this.setState({
+                            ['signin']: {...signin}                            
+                        });
+                    };
+                }, err => {
+                    console.log(err);
+                });
+                // let profiles = [...this.state.profiles];
+                // let isSubmitted = false;
+                
+                // for (let i=0; i<profiles.length; i++) {
+                //     if (profiles[i].email === this.state.signin.email && profiles[i].id ===Number.parseInt(this.state.signin.id)) {
+                //         isSubmitted = true;
+                //         localStorage.setItem('token', new Date()*1+'');
+                //     }
+                // }
+
+                // let signin = {
+                //     ...this.state.signin,
+                //     isSubmitted: isSubmitted
+                // };
+                // this.setState({
+                //     ...this.state,
+                //     ['signin']: {...signin}                            
+                // });                
             }
         },
         signUpFunctions: {
-            onSubmit: () => {}
+            onSubmit: () => {
+                let signupPromise = api.addUser({email: this.state.signup.email, first_name: this.state.signup.first_name, last_name: this.state.signup.first_name});
+                signupPromise.then((response) => {
+                    console.log(response.body);
+                }, err=> {});
+            }
         }
     }
 
@@ -99,7 +104,13 @@ export default class Authenticate extends Component {
                 );
             }
         } else if (this.props.concern === 'signup') {
-            componentUI = <h3>Signup</h3>
+            componentUI = <React.Fragment>
+                <div>Signup</div>
+                <input placeholder="email" name="email" onChange = {this.formFunctions.onChange}/>
+                <input placeholder="first_name" name="first_name" onChange = {this.formFunctions.onChange}/>
+                <input placeholder="last_name" name="last_name" onChange = {this.formFunctions.onChange}/>
+                <input type ="submit" onClick = {this.formFunctions.signUpFunctions.onSubmit}/>
+            </React.Fragment>
         }
 
         return componentUI;

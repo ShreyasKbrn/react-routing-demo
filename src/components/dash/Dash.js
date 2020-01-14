@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom';
+import { api } from '../../services/api-service';
 
 export default class Dash extends Component {
 
@@ -9,9 +10,14 @@ export default class Dash extends Component {
     }
 
     logout = () => {
-        localStorage.removeItem('token');
-        this.setState({
-            token: undefined
+        let logoutPromise = api.logout(this.state.token);
+        logoutPromise.then((response) => {
+            localStorage.removeItem('token');
+            this.setState({
+                token: undefined
+            });
+        }, err => {
+            
         });
     }
     render() {
